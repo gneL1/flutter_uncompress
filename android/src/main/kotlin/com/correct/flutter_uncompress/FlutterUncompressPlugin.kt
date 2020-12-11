@@ -48,8 +48,9 @@ class FlutterUncompressPlugin: FlutterPlugin, MethodCallHandler,ActivityAware {
         MyZip.unzip(filePath, uncompressPath, Callback {
           val pro: Double = String.format("%.2f", (it * 1.0 / size)).toDouble()
           val progress = (pro * 100).toInt()
-          mActivity.runCatching {
-            channel.invokeMethod("progress",progress)
+          //Android 端发送数据要在主现场中调用
+          mActivity.get()?.runOnUiThread {
+              channel.invokeMethod("progress",progress)
           }
 //          Log.d("测试222", "当前进度是${pro}；当前text是${text}");
 //          progressVM.progress.postValue(text)

@@ -26,7 +26,6 @@ class FlutterUncompress {
 
   static void init(){
     _channel.setMethodCallHandler((call){
-      print("当前值是${call.arguments}");
       if(_callback != null)
         _callback(call.arguments);
       return;
