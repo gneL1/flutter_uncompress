@@ -36,34 +36,48 @@ class FlutterUncompressPlugin: FlutterPlugin, MethodCallHandler,ActivityAware {
 
   @RequiresApi(Build.VERSION_CODES.N)
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
-    if (call.method == "uncompressZipFile") {
-      val filePath = call.argument("filePath") as String?
-      val uncompressPath = call.argument("uncompressPath") as String?
+
+    when(call.method){
+      "uncompressZipFile" -> {
+        val filePath = call.argument("filePath") as String?
+        val uncompressPath = call.argument("uncompressPath") as String?
 
 //      result.success("Android ${android.os.Build.VERSION.RELEASE}")
-      GlobalScope.launch {
-        val size = withContext(Dispatchers.Default) {
-          MyZip.getSize(filePath)
-        }
-        MyZip.unzip(filePath, uncompressPath, Callback {
-          val pro: Double = String.format("%.2f", (it * 1.0 / size)).toDouble()
-          val progress = (pro * 100).toInt()
-          //Android 端发送数据要在主现场中调用
-          mActivity.get()?.runOnUiThread {
-              channel.invokeMethod("progress",progress)
+        GlobalScope.launch {
+          val size = withContext(Dispatchers.Default) {
+            MyZip.getSize(filePath)
           }
+          MyZip.unzip(filePath, uncompressPath, Callback {
+            val pro: Double = String.format("%.2f", (it * 1.0 / size)).toDouble()
+            val progress = (pro * 100).toInt()
+            //Android 端发送数据要在主现场中调用
+            mActivity.get()?.runOnUiThread {
+              channel.invokeMethod("progress",progress)
+            }
 //          Log.d("测试222", "当前进度是${pro}；当前text是${text}");
 //          progressVM.progress.postValue(text)
 //                    tv1.text = text.toString()
-        })
+          })
+        }
+        result.success(true)
       }
-
-      result.success(true)
-
-    } else {
-      result.notImplemented()
+      
+//      "copyFile" -> {
+//        val bytes = call.argument("bytes") as ByteArray?
+//        val copyPath = call.argument("copyPath") as String?
+//
+//        GlobalScope.launch {
+//          withContext(Dispatchers.Default) {
+//            MyZip.copyFile(bytes, copyPath,mActivity.get())
+//          }
+//        }
+//        result.success(true)
+//      }
+      else -> result.notImplemented()
     }
+    
   }
+  
 
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
     channel.setMethodCallHandler(null)

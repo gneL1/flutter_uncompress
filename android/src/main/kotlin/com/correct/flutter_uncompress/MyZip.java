@@ -1,15 +1,26 @@
 package com.correct.flutter_uncompress;
 
+import android.content.Context;
+import android.content.res.AssetManager;
 import android.os.Build;
+import android.os.Debug;
+import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
@@ -106,6 +117,7 @@ public class MyZip {
 
     private static File buildFile(String fileName, boolean isDirectory) {
         File target = new File(fileName);
+
         if (isDirectory) {
             target.mkdirs();
         } else {
@@ -116,4 +128,32 @@ public class MyZip {
         }
         return target;
     }
+
+//    //复制文件
+//    public static void copyFile(byte[] bytes, String copyPath, Context context) throws IOException {
+////        File file = new File(copyPath + "TestZip.zip");
+////        FileOutputStream fos = new FileOutputStream(file);
+////        while (file.length() < bytes.length){
+////            fos.write(bytes,0,bytes.length);
+////            Log.d("测试","当前文件大小是" + file.length());
+////        }
+////
+////        fos.close();
+//        AssetManager assetManager = context.getAssets();
+//        String[] fileNames=assetManager.list("");// 获取assets目录下的所有文件及有文件的目录名
+//        for (String fileName : fileNames) {
+//            Log.d("测试",fileName);
+//        }
+//        InputStream is = assetManager.open("TestZip.zip");
+//        FileOutputStream fos = new FileOutputStream(new File(copyPath + "TestZip.zip"));
+//        byte[] buffer = new byte[1024];
+//        int byteCount=0;
+//        while((byteCount=is.read(buffer))!=-1) {//循环从输入流读取 buffer字节
+//            fos.write(buffer, 0, byteCount);//将读取的输入流写入到输出流
+//        }
+//        fos.flush();//刷新缓冲区
+//        is.close();
+//        fos.close();
+//
+//    }
 }
