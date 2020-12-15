@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -23,7 +22,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(primaryColor: Color(0xffc5c5c5)),
       debugShowCheckedModeBanner: false, // 设置这一属性即可
       title: 'Flutter Demo',
-      home: HomePage(),
+      home: InitPage(),
     );
   }
 }
@@ -39,10 +38,9 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    FlutterUncompress.init();
-    FlutterUncompress.onGetProgress(callback: (value) {
-      print("当前进度：" + value.toString());
-    },);
+    // FlutterUncompress.onGetProgress(callback: (value) {
+    //   print("当前进度：" + value.toString());
+    // },);
   }
 
 
@@ -60,9 +58,9 @@ class _HomePageState extends State<HomePage> {
               FlatButton(
                 onPressed: () async{
                   // String dir = (await getExternalStorageDirectory()).path + '/TestZip.zip';
-                  String dir = (await getExternalStorageDirectory()).path + '/';
-                  ByteData data = await PlatformAssetBundle().load('local/TestZip.zip');
-                  Uint8List bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+                  // String dir = (await getExternalStorageDirectory()).path + '/';
+                  // ByteData data = await PlatformAssetBundle().load('local/TestZip.zip');
+                  // Uint8List bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
 
                   // FlutterUncompress.copyFile(bytes: bytes, copyPath: dir);
                   // File file = File(dir + "TestZip.zip");
@@ -75,8 +73,8 @@ class _HomePageState extends State<HomePage> {
               
               FlatButton(
                 onPressed: () async{
-                  String dir = (await getExternalStorageDirectory()).path + '/';
-                  FlutterUncompress.uncompress(filePath: dir + 'TestZip.zip', uncompressPath: dir + 'test/');
+                  // String dir = (await getExternalStorageDirectory()).path + '/';
+                  // FlutterUncompress.uncompress(filePath: dir + 'TestZip.zip', uncompressPath: dir + 'test/');
 
                 },
                 color: Colors.red,

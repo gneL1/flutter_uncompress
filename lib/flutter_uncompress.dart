@@ -11,25 +11,37 @@ class FlutterUncompress {
   static const MethodChannel _channel =
       const MethodChannel('flutter_uncompress');
 
-  static ValueChanged<int> _callback;
+  static bool _isFinishUncompress = true;
+  static bool _isFinishCopy = true;
 
-  static bool _isFinish = true;
-
-  static Future uncompress({@required String filePath,@required String uncompressPath}) async {
-    if(!_isFinish)return;
-    _isFinish = false;
+  ///解压压缩包
+  ///filePath 是压缩包路径  比如  /storage/emulated/0/Android/data/com.correct.flutter_uncompress_example/files/engine.zip
+  ///uncompressPath 是解压后的路径  比如 /storage/emulated/0/Android/data/com.correct.flutter_uncompress_example/files/
+  ///callback 获取解压进度
+  static Future uncompress({@required String filePath,@required String uncompressPath,ValueChanged<int> progress}) async {
+    if(!_isFinishUncompress)return;
+    _channel.setMethodCallHandler((call){
+      if(progress != null)
+        progress(call.arguments);
+      return;
+    });
+    _isFinishUncompress = false;
     try{
       await _channel.invokeMethod('uncompressZipFile',{'filePath':filePath,'uncompressPath':uncompressPath});
-      _isFinish = true;
+      _isFinishUncompress = true;
     }
     catch(e){
-      _isFinish = true;
+      _isFinishUncompress = true;
     }
   }
 
-  //通过字节流复制文件
-  static Future copyFileByBytes({@required Uint8List bytes,@required String path,ValueChanged<int> callback}) async {
-
+  ///通过字节流复制文件
+  ///bytes: 要复制的字节流
+  ///path: 复制后所在地的路径 比如/storage/emulated/0/Android/data/com.correct.flutter_uncompress_example/files/engine.zip
+  ///progress: 复制进度
+  static Future copyFileByBytes({@required Uint8List bytes,@required String path,ValueChanged<int> progress}) async {
+    if(!_isFinishCopy)return;
+    _isFinishCopy = false;
     int distance = bytes.length ~/ 100;
     int _start = 0;
 
@@ -52,27 +64,17 @@ class FlutterUncompress {
         value = bytes.sublist(_start,bytes.length);
 
       count = count + value.length;
-      double num = (count * 100) / fileLength;
-      if(callback != null)callback(num.toInt());
 
+      //百分比进度
+      double num = (count * 100) / fileLength;
+      if(progress != null)progress(num.toInt());
+
+      //添加数据到缓存池
       sink.add(value);
     }
 
+    //关闭缓存
     await sink.close();
-  }
-
-  static void init(){
-    _channel.setMethodCallHandler((call){
-      if(_callback != null)
-        _callback(call.arguments);
-      return;
-    });
-  }
-
-
-
-  ///获取解压进度
-  static void onGetProgress({@required ValueChanged<int> callback}){
-    _callback = callback;
+    _isFinishCopy = true;
   }
 }
