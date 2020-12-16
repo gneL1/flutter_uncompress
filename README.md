@@ -30,3 +30,11 @@ await FlutterUncompress.copyFileByBytes(
     }
 );
 ```
+
+## 引用
+```yaml
+flutter_uncompress:
+    git:
+      url: git://github.com/gneL1/flutter_uncompress.git
+      ref: main
+```
