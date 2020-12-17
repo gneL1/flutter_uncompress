@@ -18,11 +18,21 @@ class FlutterUncompress {
   ///filePath 是压缩包路径  比如  /storage/emulated/0/Android/data/com.correct.flutter_uncompress_example/files/engine.zip
   ///uncompressPath 是解压后的路径  比如 /storage/emulated/0/Android/data/com.correct.flutter_uncompress_example/files/
   ///callback 获取解压进度
-  static Future uncompress({@required String filePath,@required String uncompressPath,ValueChanged<int> progress}) async {
+  ///onFinish：完成解压时的回调
+  static Future uncompress({@required String filePath,@required String uncompressPath,ValueChanged<int> progress,VoidCallback onFinish}) async {
     if(!_isFinishUncompress)return;
     _channel.setMethodCallHandler((call){
-      if(progress != null)
-        progress(call.arguments);
+      switch(call.method){
+        case 'progress':
+          if(progress != null)
+            progress(call.arguments);
+          break;
+        case 'progressFinish':
+          onFinish();
+          break;
+        default:
+          break;
+      }
       return;
     });
     _isFinishUncompress = false;
@@ -39,7 +49,8 @@ class FlutterUncompress {
   ///bytes: 要复制的字节流
   ///path: 复制后所在地的路径 比如/storage/emulated/0/Android/data/com.correct.flutter_uncompress_example/files/engine.zip
   ///progress: 复制进度
-  static Future copyFileByBytes({@required Uint8List bytes,@required String path,ValueChanged<int> progress}) async {
+  ///onFinish：完成复制时的回调
+  static Future copyFileByBytes({@required Uint8List bytes,@required String path,ValueChanged<int> progress,VoidCallback onFinish}) async {
     if(!_isFinishCopy)return;
     _isFinishCopy = false;
     int distance = bytes.length ~/ 100;
@@ -76,5 +87,6 @@ class FlutterUncompress {
     //关闭缓存
     await sink.close();
     _isFinishCopy = true;
+    onFinish();
   }
 }

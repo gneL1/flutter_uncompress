@@ -53,6 +53,8 @@ class FlutterUncompressPlugin: FlutterPlugin, MethodCallHandler,ActivityAware {
             //Android 端发送数据要在主现场中调用
             mActivity.get()?.runOnUiThread {
               channel.invokeMethod("progress",progress)
+              if(it == size)
+                channel.invokeMethod("progressFinish",true)
             }
 //          Log.d("测试222", "当前进度是${pro}；当前text是${text}");
 //          progressVM.progress.postValue(text)
