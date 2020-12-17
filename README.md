@@ -12,7 +12,10 @@ await FlutterUncompress.uncompress(
     uncompressPath: dir,
     progress: (value) async{
       ...
-    }
+    },
+    onFinish: () {
+      ...
+    },
 );
 ```
 
@@ -27,7 +30,10 @@ await FlutterUncompress.copyFileByBytes(
     path: dir,
     progress: (value) {
       ...
-    }
+    },
+    onFinish: () {
+      ...
+    },
 );
 ```
 
