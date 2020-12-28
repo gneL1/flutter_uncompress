@@ -1,13 +1,14 @@
 
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_uncompress/flutter_uncompress.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'dart:ui';
-
 import 'initpage_provider.dart';
 
 class InitPage extends StatefulWidget {
@@ -111,14 +112,52 @@ class _InitPageState extends State<InitPage> {
                 Align(
                   alignment: Alignment.topRight,
                   child: FlatButton(
+                    child: Text("复制文件"),
                     onPressed: _provider.onCopyFile,
-                    // onPressed: () async{
-                    //   Directory dir2 = await getApplicationDocumentsDirectory();
-                    //   print("路径$dir2");
-                    // },
-                    color: Colors.red,
-
+                    color: Colors.blue,
                   ),
+                ),
+
+                FlatButton(
+                  onPressed: () async{
+                    String _name = '测试压缩';
+                    ByteData data = await PlatformAssetBundle().load('local/$_name.zip');
+                    Uint8List bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+                    String dir = (await getExternalStorageDirectory()).path;
+                    File _file = File(dir + '/$_name.txt');
+                    File _filePic = File(dir + '/$_name.zip');
+
+                    await FlutterUncompress.bytesToTxtFile(bytes: bytes, txtFile: _file,progress: (value) {
+                      print('字节转txt文件----当前进度$value');
+                    },
+                    onFinish: () async{
+                      print('字节转txt文件----完成');
+                      await FlutterUncompress.txtToFile(
+                        txtFile: _file,
+                        rawFile: _filePic,
+                        passSize: (value) {
+                          print("txt文件转文件----文件大小" + value.toString());
+                        },
+                        onFinish: () async{
+                          print("txt文件转文件----完成");
+                          // await FlutterUncompress.uncompress(
+                          //     filePath: dir + "/$_name.zip",
+                          //     uncompressPath: dir,
+                          //   progress: (value) {
+                          //     print("解压进度" + value.toString());
+                          //   },
+                          //   onFinish: () {
+                          //     print("解压完成");
+                          //   },
+                          // );
+
+                        },
+                      );
+                    },
+                    );
+                  },
+                  color: Colors.blue,
+                  child: Text('Txt转文件'),
                 )
 
               ],
@@ -228,4 +267,7 @@ class _InitPageState extends State<InitPage> {
       ),
     );
   }
+
+
+
 }

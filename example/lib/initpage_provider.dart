@@ -35,6 +35,8 @@ class InitPageProvider with ChangeNotifier{
         },
       onFinish: () {
         print('完成解压操作');
+        _text = "";
+        notifyListeners();
       },
     );
   }
