@@ -22,7 +22,7 @@ class FlutterUncompress {
   ///uncompressPath 是解压后的路径  比如 /storage/emulated/0/Android/data/com.correct.flutter_uncompress_example/files/
   ///callback 获取解压进度
   ///onFinish：完成解压时的回调
-  static Future uncompress({@required String filePath,@required String uncompressPath,ValueChanged<int> progress,VoidCallback onFinish}) async {
+  static Future<void> uncompress({required String filePath,required String uncompressPath,ValueChanged<int>? progress,VoidCallback? onFinish}) async {
     if(!_isFinishUncompress)return;
     _channel.setMethodCallHandler((call){
       switch(call.method){
@@ -31,12 +31,13 @@ class FlutterUncompress {
             progress(call.arguments);
           break;
         case 'progressFinish':
-          onFinish();
+          if(onFinish != null)
+            onFinish();
           break;
         default:
           break;
       }
-      return;
+      return Future.value(null);
     });
     _isFinishUncompress = false;
     try{
@@ -53,7 +54,7 @@ class FlutterUncompress {
   ///path: 复制后所在地的路径 比如/storage/emulated/0/Android/data/com.correct.flutter_uncompress_example/files/engine.zip
   ///progress: 复制进度
   ///onFinish：完成复制时的回调
-  static Future copyFileByBytes({@required Uint8List bytes,@required String path,ValueChanged<int> progress,VoidCallback onFinish}) async {
+  static Future copyFileByBytes({required Uint8List bytes,required String path,ValueChanged<int>? progress,VoidCallback? onFinish}) async {
     if(!_isFinishCopy)return;
     _isFinishCopy = false;
     int distance = bytes.length ~/ 100;
@@ -90,7 +91,8 @@ class FlutterUncompress {
     //关闭缓存
     await sink.close();
     _isFinishCopy = true;
-    onFinish();
+    if(onFinish != null)
+      onFinish();
   }
 
   ///字节流转换成文本文件的内容
@@ -98,7 +100,7 @@ class FlutterUncompress {
   ///txtFile：文本文件
   ///progress: 进度
   ///onFinish：完成时的回调
-  static Future bytesToTxtFile({@required Uint8List bytes,@required File txtFile,ValueChanged<int> progress,VoidCallback onFinish}) async{
+  static Future bytesToTxtFile({required Uint8List bytes,required File txtFile,ValueChanged<int>? progress,VoidCallback? onFinish}) async{
     if(!_isFinishTxtToFile)return;
     _isFinishTxtToFile = false;
 
@@ -178,7 +180,7 @@ class FlutterUncompress {
   ///rawFile：要转换成的文件
   ///passSize: 已转换的大小
   ///onFinish：完成时的回调
-  static Future txtToFile({@required File txtFile,@required File rawFile,ValueChanged<int> passSize,VoidCallback onFinish}) async{
+  static Future txtToFile({required File txtFile,required File rawFile,ValueChanged<int>? passSize,VoidCallback? onFinish}) async{
     if(!_isTxtToFile)return;
     _isTxtToFile = false;
     if(!await rawFile.exists())
@@ -186,7 +188,7 @@ class FlutterUncompress {
     IOSink _sink = rawFile.openWrite();
 
     ///数字列表
-    List<int> _fixList = new List<int>();
+    List<int> _fixList = [];
 
     ///单次最大读取 65536 个字节
     txtFile.openRead().listen(
@@ -194,7 +196,7 @@ class FlutterUncompress {
 
         ///这里创建一个新数组来获取value的值
         ///因为通过流读取到的数据是一个固定长度的数组，无法修改！
-        List<int> event = new List<int>();
+        List<int> event = [];
         event.addAll(value);
 
         ///因为获取到的数据格式解码后可能有问题
