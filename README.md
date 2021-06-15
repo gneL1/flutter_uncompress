@@ -76,10 +76,18 @@ await FlutterUncompress.txtToFile(
     }
 );
 ```
-## 引用
+## 空安全的引用
 ```yaml
 flutter_uncompress:
     git:
       url: git://github.com/gneL1/flutter_uncompress.git
       ref: main
+```
+
+## 非安全的引用
+```yaml
+flutter_uncompress:
+    git:
+      url: git://github.com/gneL1/flutter_uncompress.git
+      ref: 0.0.3
 ```
